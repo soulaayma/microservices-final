@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  eureka-server:
+    image: openjdk:18-jdk-alpine
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    volumes:
+      - ./eureka-server/target/eureka-server.jar:/eureka-server.jar
+    entrypoint: ["java", "-jar", "/eureka-server.jar"]
+
+  config-server:
+    image: openjdk:18-jdk-alpine
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./config-server/target/config-server.jar:/config-server.jar
+    entrypoint: ["java", "-jar", "/config-server.jar"]
+    environment:
+      - SPRING_CLOUD_CONFIG_SERVER_GIT_URI=https://github.com/your-org/your-config-repo
+      - SPRING_CLOUD_CONFIG_SERVER_GIT_DEFAULT_LABEL=main
+
+  api-gateway:
+    image: openjdk:18-jdk-alpine
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./api-gateway/target/api-gateway.jar:/api-gateway.jar
+    entrypoint: ["java", "-jar", "/api-gateway.jar"]
+
+  event-app:
+    image: openjdk:18-jdk-alpine
+    container_name: event-app
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./event-app/target/event-app.jar:/event-app.jar
+    entrypoint: ["java", "-jar", "/event-app.jar"]
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/eventdb
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=example
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+
+  ticket-app:
+    image: openjdk:18-jdk-alpine
+    container_name: ticket-app
+    ports:
+      - "8082:8082"
+    volumes:
+      - ./ticket-app/target/ticket-app.jar:/ticket-app.jar
+    entrypoint: ["java", "-jar", "/ticket-app.jar"]
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo-db:27017/ticketdb
+      - SPRING_CLOUD_CONFIG_URI=http://config-server:8888
+
+  mysql-db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: eventdb
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  mongo-db:
+    image: mongo:latest
+    container_name: mongo-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mysql-data:
+  mongo-data:
