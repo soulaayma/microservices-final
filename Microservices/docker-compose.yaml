@@ -7,8 +7,8 @@ services:
     ports:
       - "8761:8761"
     volumes:
-      - ./eureka-server/target/eureka-server.jar:/eureka-server.jar
-    entrypoint: ["java", "-jar", "/eureka-server.jar"]
+      - ./Eureka/target/EurekaSever.jar:/EurekaSever.jar
+    entrypoint: ["java", "-jar", "/EurekaSever.jar"]
 
   config-server:
     image: openjdk:18-jdk-alpine
@@ -28,7 +28,7 @@ services:
     ports:
       - "8765:8765"
     volumes:
-      - ./api-gateway/target/api-gateway.jar:/api-gateway.jar
+      - ./api-gateway/target/api-gateway.jar:/gateway.jar
     entrypoint: ["java", "-jar", "/api-gateway.jar"]
 
   event-app:
@@ -37,8 +37,8 @@ services:
     ports:
       - "8081:8081"
     volumes:
-      - ./event-app/target/event-app.jar:/event-app.jar
-    entrypoint: ["java", "-jar", "/event-app.jar"]
+      - ./event/target/event.jar:/event.jar
+    entrypoint: ["java", "-jar", "/event.jar"]
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-db:3306/eventdb
       - SPRING_DATASOURCE_USERNAME=root
@@ -51,8 +51,8 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./ticket-app/target/ticket-app.jar:/ticket-app.jar
-    entrypoint: ["java", "-jar", "/ticket-app.jar"]
+      - /ticket/target/ticket.jar:/ticket.jar
+    entrypoint: ["java", "-jar", "/ticket.jar"]
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://mongo-db:27017/ticket
       - SPRING_CLOUD_CONFIG_URI=http://config-server:8181
