@@ -49,7 +49,7 @@ services:
     image: openjdk:18-jdk-alpine
     container_name: ticket-app
     ports:
-      - "8082:8082"
+      - "8080:8080"
     volumes:
       - ./ticket-app/target/ticket-app.jar:/ticket-app.jar
     entrypoint: ["java", "-jar", "/ticket-app.jar"]
